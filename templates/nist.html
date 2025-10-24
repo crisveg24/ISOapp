@@ -1,0 +1,157 @@
+{% extends "base.html" %}
+
+{% block title %}NIST CSF - Marco de Ciberseguridad{% endblock %}
+
+{% block content %}
+<div class="content-container">
+    <div class="page-header">
+        <h1><i class="fas fa-lock"></i> NIST Cybersecurity Framework</h1>
+        <p class="subtitle">Marco de Ciberseguridad del National Institute of Standards and Technology</p>
+    </div>
+
+    <div class="info-banner">
+        <i class="fas fa-info-circle"></i>
+        <div>
+            <strong>NIST CSF:</strong>
+            <p>Framework con 5 funciones clave: Identificar, Proteger, Detectar, Responder y Recuperar.</p>
+        </div>
+    </div>
+
+    <div class="nist-functions">
+        <div class="function-tab active" data-function="all" onclick="filterFunction('all')">
+            <i class="fas fa-th"></i>
+            <span>Todas</span>
+        </div>
+        <div class="function-tab" data-function="Identificar" onclick="filterFunction('Identificar')">
+            <i class="fas fa-search"></i>
+            <span>Identificar</span>
+        </div>
+        <div class="function-tab" data-function="Proteger" onclick="filterFunction('Proteger')">
+            <i class="fas fa-shield-alt"></i>
+            <span>Proteger</span>
+        </div>
+        <div class="function-tab" data-function="Detectar" onclick="filterFunction('Detectar')">
+            <i class="fas fa-eye"></i>
+            <span>Detectar</span>
+        </div>
+        <div class="function-tab" data-function="Responder" onclick="filterFunction('Responder')">
+            <i class="fas fa-exclamation-triangle"></i>
+            <span>Responder</span>
+        </div>
+        <div class="function-tab" data-function="Recuperar" onclick="filterFunction('Recuperar')">
+            <i class="fas fa-redo"></i>
+            <span>Recuperar</span>
+        </div>
+    </div>
+
+    <div class="controls-container">
+        {% for row in data.data %}
+        <div class="control-card" data-function="{{ row[0].split('(')[0].strip() }}">
+            <div class="control-header control-{{ row[0].split('(')[0].strip().lower() }}">
+                <i class="fas fa-{{ 'search' if 'Identificar' in row[0] else 'shield-alt' if 'Proteger' in row[0] else 'eye' if 'Detectar' in row[0] else 'exclamation-triangle' if 'Responder' in row[0] else 'redo' }}"></i>
+                <span class="function-badge">{{ row[0] }}</span>
+            </div>
+            <div class="control-body">
+                <h3>{{ row[1] }}</h3>
+                <p class="control-description">{{ row[2] }}</p>
+                <div class="control-implementation">
+                    <strong><i class="fas fa-cog"></i> Implementación:</strong>
+                    <p>{{ row[3] }}</p>
+                </div>
+                <div class="control-responsible">
+                    <i class="fas fa-user-tie"></i>
+                    <strong>Responsable:</strong> {{ row[4] }}
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <div class="summary-section">
+        <h2><i class="fas fa-chart-pie"></i> Resumen de Controles por Función</h2>
+        <div class="summary-grid">
+            <div class="summary-item">
+                <div class="summary-icon identify">
+                    <i class="fas fa-search"></i>
+                </div>
+                <h3>Identificar</h3>
+                <p class="summary-count" id="count-identify">0</p>
+            </div>
+            <div class="summary-item">
+                <div class="summary-icon protect">
+                    <i class="fas fa-shield-alt"></i>
+                </div>
+                <h3>Proteger</h3>
+                <p class="summary-count" id="count-protect">0</p>
+            </div>
+            <div class="summary-item">
+                <div class="summary-icon detect">
+                    <i class="fas fa-eye"></i>
+                </div>
+                <h3>Detectar</h3>
+                <p class="summary-count" id="count-detect">0</p>
+            </div>
+            <div class="summary-item">
+                <div class="summary-icon respond">
+                    <i class="fas fa-exclamation-triangle"></i>
+                </div>
+                <h3>Responder</h3>
+                <p class="summary-count" id="count-respond">0</p>
+            </div>
+            <div class="summary-item">
+                <div class="summary-icon recover">
+                    <i class="fas fa-redo"></i>
+                </div>
+                <h3>Recuperar</h3>
+                <p class="summary-count" id="count-recover">0</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    function filterFunction(func) {
+        const cards = document.querySelectorAll('.control-card');
+        const tabs = document.querySelectorAll('.function-tab');
+        
+        // Actualizar tabs activos
+        tabs.forEach(tab => tab.classList.remove('active'));
+        event.target.closest('.function-tab').classList.add('active');
+        
+        // Filtrar tarjetas
+        cards.forEach(card => {
+            const cardFunc = card.getAttribute('data-function');
+            if (func === 'all' || cardFunc.includes(func)) {
+                card.style.display = 'block';
+            } else {
+                card.style.display = 'none';
+            }
+        });
+    }
+    
+    function countControls() {
+        const cards = document.querySelectorAll('.control-card');
+        let identify = 0, protect = 0, detect = 0, respond = 0, recover = 0;
+        
+        cards.forEach(card => {
+            const func = card.getAttribute('data-function');
+            if (func.includes('Identificar')) identify++;
+            else if (func.includes('Proteger')) protect++;
+            else if (func.includes('Detectar')) detect++;
+            else if (func.includes('Responder')) respond++;
+            else if (func.includes('Recuperar')) recover++;
+        });
+        
+        document.getElementById('count-identify').textContent = identify;
+        document.getElementById('count-protect').textContent = protect;
+        document.getElementById('count-detect').textContent = detect;
+        document.getElementById('count-respond').textContent = respond;
+        document.getElementById('count-recover').textContent = recover;
+    }
+    
+    // Inicializar contadores
+    countControls();
+</script>
+{% endblock %}

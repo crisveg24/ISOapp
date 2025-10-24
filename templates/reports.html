@@ -1,0 +1,204 @@
+{% extends "base.html" %}
+
+{% block title %}Reportes - ISOapp{% endblock %}
+
+{% block content %}
+<div class="content-container">
+    <div class="page-header">
+        <h1><i class="fas fa-file-pdf"></i> Generador de Reportes</h1>
+        <p class="subtitle">Genera reportes completos de análisis de seguridad en formato PDF</p>
+    </div>
+
+    <div class="report-builder">
+        <div class="report-options">
+            <h2><i class="fas fa-cog"></i> Configurar Reporte</h2>
+            
+            <div class="option-group">
+                <h3>Secciones a Incluir:</h3>
+                <div class="checkbox-group">
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="section-magerit" checked>
+                        <span><i class="fas fa-chart-line"></i> Análisis de Riesgos (MAGERIT)</span>
+                    </label>
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="section-anexo" checked>
+                        <span><i class="fas fa-shield-alt"></i> Controles ISO 27001 (Anexo A)</span>
+                    </label>
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="section-cobit" checked>
+                        <span><i class="fas fa-cogs"></i> Procesos COBIT</span>
+                    </label>
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="section-nist" checked>
+                        <span><i class="fas fa-lock"></i> Marco NIST CSF</span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="option-group">
+                <h3>Información del Reporte:</h3>
+                <div class="form-group">
+                    <label>Título del Reporte:</label>
+                    <input type="text" id="report-title" class="form-control" value="Reporte de Análisis de Seguridad de la Información" placeholder="Título del reporte">
+                </div>
+                <div class="form-group">
+                    <label>Descripción:</label>
+                    <textarea id="report-description" class="form-control" rows="3" placeholder="Descripción adicional del reporte">Proyecto: Identificación de Zonas Geotérmicas utilizando Redes Neuronales Convolucionales (CNN)</textarea>
+                </div>
+            </div>
+
+            <button onclick="generateReport()" class="btn btn-success btn-large">
+                <i class="fas fa-download"></i> Generar Reporte PDF
+            </button>
+        </div>
+
+        <div class="report-preview">
+            <h2><i class="fas fa-eye"></i> Vista Previa</h2>
+            <div class="preview-content">
+                <div class="preview-header">
+                    <h1>📄 Reporte de Seguridad</h1>
+                    <p class="preview-date">Fecha: <span id="preview-date"></span></p>
+                </div>
+                
+                <div class="preview-sections">
+                    <div class="preview-section" id="preview-magerit">
+                        <h3><i class="fas fa-chart-line"></i> MAGERIT</h3>
+                        <p>Análisis de riesgos de activos del proyecto</p>
+                    </div>
+                    <div class="preview-section" id="preview-anexo">
+                        <h3><i class="fas fa-shield-alt"></i> ISO 27001</h3>
+                        <p>Controles de seguridad implementados</p>
+                    </div>
+                    <div class="preview-section" id="preview-cobit">
+                        <h3><i class="fas fa-cogs"></i> COBIT</h3>
+                        <p>Procesos de gobernanza de TI</p>
+                    </div>
+                    <div class="preview-section" id="preview-nist">
+                        <h3><i class="fas fa-lock"></i> NIST CSF</h3>
+                        <p>Marco de ciberseguridad</p>
+                    </div>
+                </div>
+                
+                <div class="preview-footer">
+                    <p>ISOapp - Sistema de Gestión de Seguridad</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="reports-history">
+        <h2><i class="fas fa-history"></i> Reportes Recientes</h2>
+        <div class="history-info">
+            <i class="fas fa-info-circle"></i>
+            <p>Los reportes generados se descargarán automáticamente en tu navegador.</p>
+        </div>
+    </div>
+</div>
+
+<div id="loadingModal" class="modal" style="display: none;">
+    <div class="modal-content modal-small">
+        <div class="loading-content">
+            <div class="spinner"></div>
+            <h3>Generando Reporte...</h3>
+            <p>Por favor espera mientras se genera tu reporte PDF</p>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Actualizar fecha en vista previa
+    function updatePreviewDate() {
+        const now = new Date();
+        const dateStr = now.toLocaleDateString('es-ES', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+        document.getElementById('preview-date').textContent = dateStr;
+    }
+    
+    // Actualizar vista previa según checkboxes
+    function updatePreview() {
+        const sections = ['magerit', 'anexo', 'cobit', 'nist'];
+        sections.forEach(section => {
+            const checkbox = document.getElementById(`section-${section}`);
+            const previewSection = document.getElementById(`preview-${section}`);
+            if (checkbox.checked) {
+                previewSection.style.display = 'block';
+            } else {
+                previewSection.style.display = 'none';
+            }
+        });
+    }
+    
+    // Escuchar cambios en checkboxes
+    document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
+        checkbox.addEventListener('change', updatePreview);
+    });
+    
+    function generateReport() {
+        // Obtener secciones seleccionadas
+        const sections = [];
+        if (document.getElementById('section-magerit').checked) sections.push('magerit');
+        if (document.getElementById('section-anexo').checked) sections.push('anexo_a');
+        if (document.getElementById('section-cobit').checked) sections.push('cobit');
+        if (document.getElementById('section-nist').checked) sections.push('nist');
+        
+        if (sections.length === 0) {
+            alert('Por favor selecciona al menos una sección para incluir en el reporte');
+            return;
+        }
+        
+        // Mostrar modal de carga
+        document.getElementById('loadingModal').style.display = 'block';
+        
+        // Generar reporte
+        fetch('/api/report/generate', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                sections: sections,
+                title: document.getElementById('report-title').value,
+                description: document.getElementById('report-description').value
+            })
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Error al generar el reporte');
+            }
+            return response.blob();
+        })
+        .then(blob => {
+            // Crear URL del blob y descargar
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `reporte_seguridad_${new Date().getTime()}.pdf`;
+            document.body.appendChild(a);
+            a.click();
+            window.URL.revokeObjectURL(url);
+            document.body.removeChild(a);
+            
+            // Ocultar modal
+            document.getElementById('loadingModal').style.display = 'none';
+            
+            alert('¡Reporte generado exitosamente!');
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            document.getElementById('loadingModal').style.display = 'none';
+            alert('Error al generar el reporte: ' + error.message);
+        });
+    }
+    
+    // Inicializar
+    updatePreviewDate();
+    updatePreview();
+</script>
+{% endblock %}

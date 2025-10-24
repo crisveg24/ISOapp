@@ -1,0 +1,373 @@
+{% extends "base.html" %}
+
+{% block title %}MAGERIT - Análisis de Riesgos{% endblock %}
+
+{% block content %}
+<div class="content-container">
+    <div class="page-header">
+        <h1><i class="fas fa-chart-line"></i> Análisis de Riesgos - MAGERIT</h1>
+        <p class="subtitle">Metodología de Análisis y Gestión de Riesgos de los Sistemas de Información</p>
+    </div>
+
+    <div class="info-banner">
+        <i class="fas fa-info-circle"></i>
+        <div>
+            <strong>Cálculo de Riesgos:</strong>
+            <p>Riesgo Intrínseco = Frecuencia × Impacto | Riesgo Residual = Riesgo Intrínseco - (Riesgo Intrínseco × % Salvaguarda)</p>
+        </div>
+    </div>
+
+    <div class="calculator-section">
+        <h2><i class="fas fa-calculator"></i> Calculadora de Riesgos</h2>
+        <div class="calculator-form">
+            <div class="form-group">
+                <label>Frecuencia:</label>
+                <input type="number" id="calc-frecuencia" step="0.1" placeholder="Ej: 1">
+                <small>Veces por período</small>
+            </div>
+            <div class="form-group">
+                <label>Impacto:</label>
+                <input type="number" id="calc-impacto" step="0.1" placeholder="Ej: 3.5">
+                <small>Escala de impacto</small>
+            </div>
+            <div class="form-group">
+                <label>Salvaguarda (%):</label>
+                <input type="number" id="calc-salvaguarda" step="1" min="0" max="100" placeholder="Ej: 85">
+                <small>Efectividad 0-100%</small>
+            </div>
+            <button onclick="calculateRisk()" class="btn btn-primary">
+                <i class="fas fa-calculator"></i> Calcular
+            </button>
+        </div>
+        <div id="calc-result" class="calc-result" style="display:none;">
+            <div class="result-item">
+                <strong>Riesgo Intrínseco:</strong>
+                <span id="result-intrinseco"></span>
+            </div>
+            <div class="result-item">
+                <strong>Riesgo Residual:</strong>
+                <span id="result-residual"></span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Formulario para Agregar Nuevo Activo -->
+    <div class="add-asset-section">
+        <div class="card">
+            <div class="card-header">
+                <i class="fas fa-plus-circle"></i>
+                <h2>Agregar Nuevo Activo</h2>
+                <button id="toggle-add-form" class="btn btn-sm btn-primary" onclick="toggleAddForm()">
+                    <i class="fas fa-chevron-down"></i> Mostrar Formulario
+                </button>
+            </div>
+            <div id="add-asset-form" class="card-body" style="display: none;">
+                <form id="new-asset-form">
+                    <div class="form-grid-2">
+                        <div class="form-group">
+                            <label for="new-tipo-activo">Tipo de Activo *</label>
+                            <input type="text" id="new-tipo-activo" placeholder="Ej: Datos Geoespaciales" required>
+                            <small>Categoría del activo</small>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="new-activo">Nombre del Activo *</label>
+                            <input type="text" id="new-activo" placeholder="Ej: Datos de Zonas Geotérmicas" required>
+                            <small>Descripción del activo</small>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="new-amenaza">Amenaza *</label>
+                            <input type="text" id="new-amenaza" placeholder="Ej: Acceso no autorizado a datos" required>
+                            <small>Amenaza identificada</small>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="new-valor-economico">Valor Económico *</label>
+                            <input type="text" id="new-valor-economico" placeholder="Ej: Normal: 1.350.000 COP" required>
+                            <small>Valor del activo</small>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="new-frecuencia-texto">Frecuencia (Texto)</label>
+                            <input type="text" id="new-frecuencia-texto" placeholder="Ej: 1 vez cada 3 meses">
+                            <small>Descripción de frecuencia</small>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="new-frecuencia">Frecuencia (Número) *</label>
+                            <input type="number" id="new-frecuencia" step="0.1" min="0" max="5" placeholder="Ej: 1.5" required>
+                            <small>Valor numérico (0-5)</small>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="new-impacto">Impacto *</label>
+                            <input type="number" id="new-impacto" step="0.1" min="0" max="5" placeholder="Ej: 3.5" required>
+                            <small>Nivel de impacto (0-5)</small>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="new-valor-salvaguarda-pct">% Salvaguarda *</label>
+                            <input type="number" id="new-valor-salvaguarda-pct" step="1" min="0" max="100" placeholder="Ej: 85" required>
+                            <small>Efectividad (0-100%)</small>
+                        </div>
+
+                        <div class="form-group full-width">
+                            <label for="new-salvaguarda">Salvaguardas Implementadas *</label>
+                            <textarea id="new-salvaguarda" rows="2" placeholder="Ej: Backup de datos, Cifrado de datos, Protección de acceso" required></textarea>
+                            <small>Lista de salvaguardas</small>
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-success btn-large">
+                            <i class="fas fa-plus-circle"></i> Agregar Activo
+                        </button>
+                        <button type="button" class="btn btn-secondary" onclick="resetAddForm()">
+                            <i class="fas fa-undo"></i> Limpiar Formulario
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="table-section">
+        <h2><i class="fas fa-table"></i> Activos y Riesgos</h2>
+        <div class="table-responsive">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        {% for header in data.headers %}
+                        <th>{{ header }}</th>
+                        {% endfor %}
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in data.data %}
+                    <tr data-row-id="{{ row[0] }}">
+                        {% for cell in row %}
+                        <td>{{ cell }}</td>
+                        {% endfor %}
+                        <td>
+                            <button onclick="editRow({{ row[0] }})" class="btn-icon" title="Editar">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Edición -->
+<div id="editModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2><i class="fas fa-edit"></i> Editar Activo</h2>
+            <span class="close" onclick="closeModal()">&times;</span>
+        </div>
+        <div class="modal-body">
+            <form id="editForm">
+                <input type="hidden" id="edit-row-id">
+                
+                <div class="form-group">
+                    <label>Valor Económico del Activo:</label>
+                    <input type="text" id="edit-valor-economico" class="form-control">
+                </div>
+                
+                <div class="form-group">
+                    <label>Frecuencia:</label>
+                    <input type="number" id="edit-frecuencia" step="0.1" class="form-control">
+                </div>
+                
+                <div class="form-group">
+                    <label>Impacto:</label>
+                    <input type="number" id="edit-impacto" step="0.1" class="form-control">
+                </div>
+                
+                <div class="form-group">
+                    <label>Salvaguarda:</label>
+                    <input type="text" id="edit-salvaguarda" class="form-control">
+                </div>
+                
+                <div class="form-group">
+                    <label>Valor Salvaguarda (%):</label>
+                    <input type="text" id="edit-valor-salvaguarda" class="form-control">
+                </div>
+                
+                <div class="form-actions">
+                    <button type="button" onclick="saveChanges()" class="btn btn-success">
+                        <i class="fas fa-save"></i> Guardar Cambios
+                    </button>
+                    <button type="button" onclick="closeModal()" class="btn btn-secondary">
+                        <i class="fas fa-times"></i> Cancelar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    function calculateRisk() {
+        const frecuencia = parseFloat(document.getElementById('calc-frecuencia').value);
+        const impacto = parseFloat(document.getElementById('calc-impacto').value);
+        const salvaguarda = parseFloat(document.getElementById('calc-salvaguarda').value);
+        
+        if (!frecuencia || !impacto || isNaN(salvaguarda)) {
+            alert('Por favor complete todos los campos');
+            return;
+        }
+        
+        fetch('/api/magerit/calculate', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({
+                frecuencia: frecuencia,
+                impacto: impacto,
+                salvaguarda_pct: salvaguarda
+            })
+        })
+        .then(response => response.json())
+        .then(result => {
+            if (result.success) {
+                document.getElementById('result-intrinseco').textContent = result.data.riesgo_intrinseco;
+                document.getElementById('result-residual').textContent = result.data.riesgo_residual;
+                document.getElementById('calc-result').style.display = 'block';
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Error al calcular riesgo');
+        });
+    }
+
+    // Toggle del formulario de agregar activo
+    function toggleAddForm() {
+        const form = document.getElementById('add-asset-form');
+        const button = document.getElementById('toggle-add-form');
+        
+        if (form.style.display === 'none') {
+            form.style.display = 'block';
+            button.innerHTML = '<i class="fas fa-chevron-up"></i> Ocultar Formulario';
+        } else {
+            form.style.display = 'none';
+            button.innerHTML = '<i class="fas fa-chevron-down"></i> Mostrar Formulario';
+        }
+    }
+
+    // Resetear formulario
+    function resetAddForm() {
+        document.getElementById('new-asset-form').reset();
+    }
+
+    // Manejar envío del formulario de nuevo activo
+    document.getElementById('new-asset-form').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const formData = {
+            tipo_activo: document.getElementById('new-tipo-activo').value,
+            activo: document.getElementById('new-activo').value,
+            amenaza: document.getElementById('new-amenaza').value,
+            valor_economico: document.getElementById('new-valor-economico').value,
+            frecuencia_texto: document.getElementById('new-frecuencia-texto').value || document.getElementById('new-frecuencia').value,
+            frecuencia: parseFloat(document.getElementById('new-frecuencia').value),
+            impacto: parseFloat(document.getElementById('new-impacto').value),
+            salvaguarda: document.getElementById('new-salvaguarda').value,
+            valor_salvaguarda_pct: parseFloat(document.getElementById('new-valor-salvaguarda-pct').value)
+        };
+        
+        // Mostrar indicador de carga
+        const submitBtn = e.target.querySelector('button[type="submit"]');
+        const originalText = submitBtn.innerHTML;
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Agregando...';
+        
+        fetch('/api/magerit/add', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(formData)
+        })
+        .then(response => response.json())
+        .then(result => {
+            if (result.success) {
+                alert('¡Activo agregado correctamente! Recargando página...');
+                location.reload();
+            } else {
+                alert('Error al agregar activo: ' + result.error);
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalText;
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Error al agregar el activo');
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = originalText;
+        });
+    });
+    
+    function editRow(rowId) {
+        document.getElementById('edit-row-id').value = rowId;
+        document.getElementById('editModal').style.display = 'block';
+        
+        // Obtener datos actuales de la fila
+        const row = document.querySelector(`tr[data-row-id="${rowId}"]`);
+        const cells = row.querySelectorAll('td');
+        
+        document.getElementById('edit-valor-economico').value = cells[4].textContent;
+        document.getElementById('edit-frecuencia').value = cells[5].textContent;
+        document.getElementById('edit-impacto').value = cells[6].textContent.replace(',', '.');
+        document.getElementById('edit-salvaguarda').value = cells[8].textContent;
+        document.getElementById('edit-valor-salvaguarda').value = cells[9].textContent;
+    }
+    
+    function closeModal() {
+        document.getElementById('editModal').style.display = 'none';
+    }
+    
+    function saveChanges() {
+        const rowId = document.getElementById('edit-row-id').value;
+        const data = {
+            valor_economico: document.getElementById('edit-valor-economico').value,
+            frecuencia: parseFloat(document.getElementById('edit-frecuencia').value),
+            impacto: parseFloat(document.getElementById('edit-impacto').value),
+            salvaguarda: document.getElementById('edit-salvaguarda').value,
+            valor_salvaguarda: document.getElementById('edit-valor-salvaguarda').value
+        };
+        
+        fetch(`/api/magerit/update/${rowId}`, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(data)
+        })
+        .then(response => response.json())
+        .then(result => {
+            if (result.success) {
+                alert('Activo actualizado correctamente');
+                location.reload();
+            } else {
+                alert('Error: ' + result.error);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Error al guardar cambios');
+        });
+    }
+    
+    // Cerrar modal al hacer clic fuera
+    window.onclick = function(event) {
+        const modal = document.getElementById('editModal');
+        if (event.target == modal) {
+            modal.style.display = 'none';
+        }
+    }
+</script>
+{% endblock %}

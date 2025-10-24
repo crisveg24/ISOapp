@@ -1,0 +1,133 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - ISOapp{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+    <div class="page-header">
+        <h1><i class="fas fa-chart-pie"></i> Dashboard de Seguridad de la Información</h1>
+        <p class="subtitle">Proyecto: Identificación de Zonas Geotérmicas con CNN</p>
+    </div>
+
+    <div class="stats-grid">
+        <div class="stat-card stat-card-magerit">
+            <div class="stat-icon">
+                <i class="fas fa-exclamation-triangle"></i>
+            </div>
+            <div class="stat-content">
+                <h3>MAGERIT</h3>
+                <p class="stat-number" id="magerit-count">0</p>
+                <p class="stat-label">Activos Analizados</p>
+            </div>
+        </div>
+
+        <div class="stat-card stat-card-iso">
+            <div class="stat-icon">
+                <i class="fas fa-shield-alt"></i>
+            </div>
+            <div class="stat-content">
+                <h3>ISO 27001</h3>
+                <p class="stat-number" id="iso-count">0</p>
+                <p class="stat-label">Controles Implementados</p>
+            </div>
+        </div>
+
+        <div class="stat-card stat-card-cobit">
+            <div class="stat-icon">
+                <i class="fas fa-sitemap"></i>
+            </div>
+            <div class="stat-content">
+                <h3>COBIT</h3>
+                <p class="stat-number" id="cobit-count">0</p>
+                <p class="stat-label">Procesos Definidos</p>
+            </div>
+        </div>
+
+        <div class="stat-card stat-card-nist">
+            <div class="stat-icon">
+                <i class="fas fa-lock"></i>
+            </div>
+            <div class="stat-content">
+                <h3>NIST CSF</h3>
+                <p class="stat-number" id="nist-count">0</p>
+                <p class="stat-label">Controles Activos</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="info-grid">
+        <div class="info-card">
+            <div class="info-header">
+                <i class="fas fa-chart-line"></i>
+                <h2>Análisis de Riesgos - MAGERIT</h2>
+            </div>
+            <p>Metodología española de análisis y gestión de riesgos. Evalúa activos, amenazas y salvaguardas para calcular riesgos intrínsecos y residuales.</p>
+            <a href="{{ url_for('magerit_view') }}" class="btn btn-primary">
+                <i class="fas fa-arrow-right"></i> Ver Análisis
+            </a>
+        </div>
+
+        <div class="info-card">
+            <div class="info-header">
+                <i class="fas fa-list-check"></i>
+                <h2>Controles ISO 27001</h2>
+            </div>
+            <p>Sistema de Gestión de Seguridad de la Información. Controles organizacionales, de personas y tecnológicos según el Anexo A.</p>
+            <a href="{{ url_for('anexo_a_view') }}" class="btn btn-primary">
+                <i class="fas fa-arrow-right"></i> Ver Controles
+            </a>
+        </div>
+
+        <div class="info-card">
+            <div class="info-header">
+                <i class="fas fa-tasks"></i>
+                <h2>Procesos COBIT</h2>
+            </div>
+            <p>Marco de gobierno y gestión de TI empresarial. Alinea estrategias tecnológicas con objetivos de negocio y gestión de riesgos.</p>
+            <a href="{{ url_for('cobit_view') }}" class="btn btn-primary">
+                <i class="fas fa-arrow-right"></i> Ver Procesos
+            </a>
+        </div>
+
+        <div class="info-card">
+            <div class="info-header">
+                <i class="fas fa-fingerprint"></i>
+                <h2>Marco NIST CSF</h2>
+            </div>
+            <p>Framework de ciberseguridad del NIST. Cinco funciones clave: Identificar, Proteger, Detectar, Responder y Recuperar.</p>
+            <a href="{{ url_for('nist_view') }}" class="btn btn-primary">
+                <i class="fas fa-arrow-right"></i> Ver Marco
+            </a>
+        </div>
+    </div>
+
+    <div class="actions-section">
+        <div class="action-card">
+            <i class="fas fa-file-pdf"></i>
+            <h3>Generar Reporte</h3>
+            <p>Crea un reporte completo en PDF con todos los análisis y controles implementados</p>
+            <a href="{{ url_for('reports_view') }}" class="btn btn-success">
+                <i class="fas fa-download"></i> Ir a Reportes
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Cargar estadísticas
+    fetch('/api/data/all')
+        .then(response => response.json())
+        .then(result => {
+            if (result.success) {
+                const data = result.data;
+                document.getElementById('magerit-count').textContent = data.magerit.data.length;
+                document.getElementById('iso-count').textContent = data.anexo_a.data.length;
+                document.getElementById('cobit-count').textContent = data.cobit.data.length;
+                document.getElementById('nist-count').textContent = data.nist.data.length;
+            }
+        })
+        .catch(error => console.error('Error:', error));
+</script>
+{% endblock %}

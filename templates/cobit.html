@@ -1,0 +1,275 @@
+{% extends "base.html" %}
+
+{% block title %}COBIT - Procesos de Gobernanza TI{% endblock %}
+
+{% block content %}
+<div class="content-container">
+    <div class="page-header">
+        <h1><i class="fas fa-cogs"></i> COBIT - Marco de Gobernanza y Gestión de TI</h1>
+        <p class="subtitle">Control Objectives for Information and Related Technology</p>
+    </div>
+
+    <div class="metadata-section">
+        <div class="alert alert-info">
+            <i class="fas fa-info-circle"></i>
+            <div>
+                <strong>{{ data.metadata[0][0] }}</strong>
+                <p>{{ data.metadata[0][2] }}</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Diagrama de Gobierno y Gestión -->
+    <div class="cobit-diagram-section">
+        <div class="card">
+            <div class="card-header" style="background: linear-gradient(135deg, #e74c3c, #c0392b);">
+                <h2><i class="fas fa-sitemap"></i> Modelo de Gobernanza y Gestión COBIT</h2>
+            </div>
+            <div class="card-body">
+                <div class="cobit-model">
+                    <!-- Capa de Gobierno -->
+                    <div class="gobierno-layer">
+                        <div class="layer-title gobierno-title">
+                            <i class="fas fa-crown"></i>
+                            <h3>GOBIERNO</h3>
+                        </div>
+                        <div class="gobierno-content">
+                            <div class="gobierno-center">
+                                <div class="proceso-box evaluar">
+                                    <i class="fas fa-chart-line"></i>
+                                    <strong>Evaluar</strong>
+                                </div>
+                                <div class="retroalimentacion">
+                                    <i class="fas fa-sync-alt"></i>
+                                    <span>Retroalimentación Gerencial</span>
+                                </div>
+                            </div>
+                            <div class="gobierno-sides">
+                                <div class="proceso-box dirigir">
+                                    <i class="fas fa-bullseye"></i>
+                                    <strong>Dirigir</strong>
+                                </div>
+                                <div class="proceso-box monitorear">
+                                    <i class="fas fa-desktop"></i>
+                                    <strong>Monitorear</strong>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Capa de Gestión -->
+                    <div class="gestion-layer">
+                        <div class="layer-title gestion-title">
+                            <i class="fas fa-tasks"></i>
+                            <h3>GESTIÓN</h3>
+                        </div>
+                        <div class="gestion-content">
+                            <div class="proceso-gestion planificar">
+                                <i class="fas fa-clipboard-list"></i>
+                                <strong>Planificar</strong>
+                            </div>
+                            <div class="arrow-right"><i class="fas fa-arrow-right"></i></div>
+                            <div class="proceso-gestion construir">
+                                <i class="fas fa-tools"></i>
+                                <strong>Construir</strong>
+                            </div>
+                            <div class="arrow-right"><i class="fas fa-arrow-right"></i></div>
+                            <div class="proceso-gestion ejecutar">
+                                <i class="fas fa-play-circle"></i>
+                                <strong>Ejecutar</strong>
+                            </div>
+                            <div class="arrow-right"><i class="fas fa-arrow-right"></i></div>
+                            <div class="proceso-gestion monitorear-g">
+                                <i class="fas fa-chart-bar"></i>
+                                <strong>Monitorear</strong>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Flechas de conexión -->
+                    <div class="conexiones">
+                        <div class="arrow-down gobierno-gestion-left"></div>
+                        <div class="arrow-down gobierno-gestion-right"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tabs de categorías -->
+    <div class="cobit-tabs">
+        <button class="cobit-tab active" data-category="all" onclick="filterCobitCategory('all')">
+            <i class="fas fa-th"></i> Todos
+        </button>
+        <button class="cobit-tab" data-category="EDM" onclick="filterCobitCategory('EDM')">
+            <i class="fas fa-crown"></i> Gobierno (EDM)
+        </button>
+        <button class="cobit-tab" data-category="APO" onclick="filterCobitCategory('APO')">
+            <i class="fas fa-clipboard-check"></i> Alinear, Planear, Organizar (APO)
+        </button>
+        <button class="cobit-tab" data-category="BAI" onclick="filterCobitCategory('BAI')">
+            <i class="fas fa-hammer"></i> Construir, Adquirir, Implementar (BAI)
+        </button>
+        <button class="cobit-tab" data-category="DSS" onclick="filterCobitCategory('DSS')">
+            <i class="fas fa-headset"></i> Entregar, Servir, Soportar (DSS)
+        </button>
+        <button class="cobit-tab" data-category="MEA" onclick="filterCobitCategory('MEA')">
+            <i class="fas fa-chart-line"></i> Monitorear, Evaluar, Valorar (MEA)
+        </button>
+    </div>
+
+    <!-- Procesos detallados -->
+    <div class="processes-grid">
+        {% for row in data.data %}
+        <div class="process-card cobit-process" data-category="{{ row[0].split('–')[0].strip() if '–' in row[0] else row[0].split('�')[0].strip() }}">
+            <div class="process-header cobit-header-{{ 'edm' if 'EDM' in row[0] else 'apo' if 'APO' in row[0] else 'bai' if 'BAI' in row[0] else 'dss' if 'DSS' in row[0] else 'mea' }}">
+                <i class="fas fa-{{ 'crown' if 'EDM' in row[0] else 'clipboard-check' if 'APO' in row[0] else 'hammer' if 'BAI' in row[0] else 'headset' if 'DSS' in row[0] else 'chart-bar' }}"></i>
+                <h3>{{ row[0] }}</h3>
+            </div>
+            <div class="process-body">
+                <div class="process-objetivo">
+                    <h4><i class="fas fa-bullseye"></i> Objetivo</h4>
+                    <p>{{ row[1] }}</p>
+                </div>
+                
+                <div class="process-detail">
+                    <h4><i class="fas fa-tasks"></i> Acciones en el Proyecto</h4>
+                    <p>{{ row[2] }}</p>
+                </div>
+                
+                <div class="process-detail">
+                    <h4><i class="fas fa-lightbulb"></i> Contribución</h4>
+                    <p>{{ row[3] }}</p>
+                </div>
+                
+                <div class="process-kpis">
+                    <h4><i class="fas fa-chart-line"></i> KPIs</h4>
+                    <p>{{ row[4] }}</p>
+                </div>
+                
+                <div class="process-entregables">
+                    <h4><i class="fas fa-file-alt"></i> Entregables</h4>
+                    <p>{{ row[5] }}</p>
+                </div>
+                
+                <div class="process-scenarios">
+                    <div class="scenario scenario-negative">
+                        <i class="fas fa-times-circle"></i>
+                        <div>
+                            <strong>Escenario Negativo:</strong>
+                            <p>{{ row[6] }}</p>
+                        </div>
+                    </div>
+                    <div class="scenario scenario-positive">
+                        <i class="fas fa-check-circle"></i>
+                        <div>
+                            <strong>Escenario Positivo:</strong>
+                            <p>{{ row[7] }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Resumen de procesos -->
+    <div class="cobit-summary">
+        <div class="card">
+            <div class="card-header">
+                <h2><i class="fas fa-chart-pie"></i> Resumen de Procesos COBIT</h2>
+            </div>
+            <div class="card-body">
+                <div class="summary-grid">
+                    <div class="summary-item">
+                        <div class="summary-icon cobit-edm">
+                            <i class="fas fa-crown"></i>
+                        </div>
+                        <h3>Gobierno (EDM)</h3>
+                        <p class="summary-count" id="count-edm">0</p>
+                        <small>Evaluar, Dirigir, Monitorear</small>
+                    </div>
+                    <div class="summary-item">
+                        <div class="summary-icon cobit-apo">
+                            <i class="fas fa-clipboard-check"></i>
+                        </div>
+                        <h3>APO</h3>
+                        <p class="summary-count" id="count-apo">0</p>
+                        <small>Alinear, Planear, Organizar</small>
+                    </div>
+                    <div class="summary-item">
+                        <div class="summary-icon cobit-bai">
+                            <i class="fas fa-hammer"></i>
+                        </div>
+                        <h3>BAI</h3>
+                        <p class="summary-count" id="count-bai">0</p>
+                        <small>Construir, Adquirir, Implementar</small>
+                    </div>
+                    <div class="summary-item">
+                        <div class="summary-icon cobit-dss">
+                            <i class="fas fa-headset"></i>
+                        </div>
+                        <h3>DSS</h3>
+                        <p class="summary-count" id="count-dss">0</p>
+                        <small>Entregar, Servir, Soportar</small>
+                    </div>
+                    <div class="summary-item">
+                        <div class="summary-icon cobit-mea">
+                            <i class="fas fa-chart-bar"></i>
+                        </div>
+                        <h3>MEA</h3>
+                        <p class="summary-count" id="count-mea">0</p>
+                        <small>Monitorear, Evaluar, Valorar</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    function filterCobitCategory(category) {
+        const cards = document.querySelectorAll('.cobit-process');
+        const tabs = document.querySelectorAll('.cobit-tab');
+        
+        // Actualizar tabs activos
+        tabs.forEach(tab => tab.classList.remove('active'));
+        event.target.classList.add('active');
+        
+        // Filtrar tarjetas
+        cards.forEach(card => {
+            const cardCategory = card.getAttribute('data-category');
+            if (category === 'all' || cardCategory.includes(category)) {
+                card.style.display = 'block';
+            } else {
+                card.style.display = 'none';
+            }
+        });
+    }
+    
+    function countProcesses() {
+        const cards = document.querySelectorAll('.cobit-process');
+        let edm = 0, apo = 0, bai = 0, dss = 0, mea = 0;
+        
+        cards.forEach(card => {
+            const category = card.getAttribute('data-category');
+            if (category.includes('EDM')) edm++;
+            else if (category.includes('APO')) apo++;
+            else if (category.includes('BAI')) bai++;
+            else if (category.includes('DSS')) dss++;
+            else if (category.includes('MEA')) mea++;
+        });
+        
+        document.getElementById('count-edm').textContent = edm;
+        document.getElementById('count-apo').textContent = apo;
+        document.getElementById('count-bai').textContent = bai;
+        document.getElementById('count-dss').textContent = dss;
+        document.getElementById('count-mea').textContent = mea;
+    }
+    
+    // Inicializar contadores
+    countProcesses();
+</script>
+{% endblock %}
